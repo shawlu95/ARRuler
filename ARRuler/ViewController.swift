@@ -14,6 +14,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet var sceneView: ARSCNView!
     
     var dotNodes = [SCNNode]()
+    var textNode = SCNNode()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -40,6 +42,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if dotNodes.count >= 2 {
+            textNode.removeFromParentNode() // clear existing text node
+            for dot in dotNodes {
+                dot.removeFromParentNode() // remove from camera
+            }
+            dotNodes = [SCNNode]() // reset to empty array
+        }
         if let touchLocation = touches.first?.location(in: sceneView) {
             // location of the 3D real space
             let hitTestResult = sceneView.hitTest(touchLocation, types: .featurePoint)
@@ -88,7 +97,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
         textGeometry.firstMaterial?.diffuse.contents = UIColor.red
         
-        let textNode = SCNNode(geometry: textGeometry)
+        textNode = SCNNode(geometry: textGeometry)
         
         // set relative to camera position
         textNode.position = SCNVector3(position.x, position.y + 0.01, position.z)
